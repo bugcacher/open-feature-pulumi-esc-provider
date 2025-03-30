@@ -2,6 +2,7 @@ package pulumi
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -73,8 +74,8 @@ func (p *PulumiESCProvider) Hooks() []openfeature.Hook {
 }
 
 // Status expose the status of the provider
-func (i PulumiESCProvider) Status() openfeature.State {
-	return i.state
+func (p *PulumiESCProvider) Status() openfeature.State {
+	return p.state
 }
 
 // BooleanEvaluation returns a boolean flag
@@ -112,22 +113,24 @@ func (p *PulumiESCProvider) ObjectEvaluation(ctx context.Context, flag string, d
 	}
 }
 
+// resolveValue retrieves a property value from the ESC service and validates its type.
+// It returns the resolved value and resolution details, or an error if the property
+// is not found, has a type mismatch, or any other error occurs.
 func (p *PulumiESCProvider) resolveValue(ctx context.Context, propertyPath string, flagType FlagType) (interface{}, openfeature.ProviderResolutionDetail) {
 	escValue, rawValue, err := p.escClient.ReadEnvironmentProperty(p.escAuthCtx, p.orgName, p.projectName, p.envName, p.escOpenEnvSessionId, propertyPath)
 	if err != nil {
 		var genErr *esc.GenericOpenAPIError
-		if errors.As(err, &genErr) && isNotFoundErr(genErr) {
+		if errors.As(err, &genErr) && isKeyNotFoundErr(genErr) {
 			return nil, openfeature.ProviderResolutionDetail{
 				ResolutionError: openfeature.NewFlagNotFoundResolutionError(fmt.Sprintf("%s not found", propertyPath)),
 			}
 		}
 		return nil, openfeature.ProviderResolutionDetail{ResolutionError: openfeature.NewGeneralResolutionError(err.Error())}
 	}
-	parsedValue, ok := typeChecker(rawValue, flagType)
-	if !ok {
+	if !validateType(rawValue, flagType) {
 		return nil, openfeature.ProviderResolutionDetail{ResolutionError: openfeature.NewTypeMismatchResolutionError(fmt.Sprintf("%s not of type %s", propertyPath, flagType))}
 	}
-	return parsedValue, openfeature.ProviderResolutionDetail{
+	return rawValue, openfeature.ProviderResolutionDetail{
 		Reason: openfeature.StaticReason,
 		FlagMetadata: openfeature.FlagMetadata{
 			"secret": escValue.GetSecret(),
@@ -136,25 +139,36 @@ func (p *PulumiESCProvider) resolveValue(ctx context.Context, propertyPath strin
 	}
 }
 
-func typeChecker(rawValue interface{}, flagType FlagType) (interface{}, bool) {
+// validateType checks if the given raw value can be parsed into the given FlagType
+func validateType(rawValue interface{}, flagType FlagType) bool {
 	switch flagType {
 	case FlagType_Bool:
-		parsedValue, ok := rawValue.(bool)
-		return parsedValue, ok
+		_, ok := rawValue.(bool)
+		return ok
 	case FlagType_String:
-		parsedValue, ok := rawValue.(string)
-		return parsedValue, ok
+		_, ok := rawValue.(string)
+		return ok
 	case FlagType_Integer:
-		parsedValue, ok := rawValue.(int64)
-		return parsedValue, ok
+		_, ok := rawValue.(int64)
+		return ok
 	case FlagType_Float:
-		parsedValue, ok := rawValue.(float64)
-		return parsedValue, ok
+		_, ok := rawValue.(float64)
+		return ok
 	case FlagType_Object:
 	}
-	return nil, false
+	return false
 }
 
-func isNotFoundErr(err *esc.GenericOpenAPIError) bool {
-	return strings.Contains(string(err.Body()), "not found")
+// isKeyNotFoundErr determines whether the given GenericOpenAPIError indicates a 'key not found' condition.
+func isKeyNotFoundErr(openApiErr *esc.GenericOpenAPIError) bool {
+	type OpenAPIErrResp struct {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+	}
+	var errResp OpenAPIErrResp
+	err := json.Unmarshal(openApiErr.Body(), &errResp)
+	if err != nil {
+		return false
+	}
+	return errResp.Code == 400 && strings.Contains(errResp.Message, "not found")
 }
