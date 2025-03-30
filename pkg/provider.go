@@ -81,26 +81,42 @@ func (p *PulumiESCProvider) Status() openfeature.State {
 // BooleanEvaluation returns a boolean flag
 func (p *PulumiESCProvider) BooleanEvaluation(ctx context.Context, flag string, defaultValue bool, evalCtx openfeature.FlattenedContext) openfeature.BoolResolutionDetail {
 	value, resolutionDetails := p.resolveValue(ctx, flag, FlagType_Bool)
-	return openfeature.BoolResolutionDetail{Value: value.(bool), ProviderResolutionDetail: resolutionDetails}
+	boolResolutionDetails := openfeature.BoolResolutionDetail{ProviderResolutionDetail: resolutionDetails}
+	if value != nil {
+		boolResolutionDetails.Value = value.(bool)
+	}
+	return boolResolutionDetails
 }
 
 // StringEvaluation returns a string flag
 func (p *PulumiESCProvider) StringEvaluation(ctx context.Context, flag string, defaultValue string, evalCtx openfeature.FlattenedContext) openfeature.StringResolutionDetail {
 	value, resolutionDetails := p.resolveValue(ctx, flag, FlagType_String)
-	return openfeature.StringResolutionDetail{Value: value.(string), ProviderResolutionDetail: resolutionDetails}
+	stringResolutionDetails := openfeature.StringResolutionDetail{ProviderResolutionDetail: resolutionDetails}
+	if value != nil {
+		stringResolutionDetails.Value = value.(string)
+	}
+	return stringResolutionDetails
 }
 
 // FloatEvaluation returns a float flag
 func (p *PulumiESCProvider) FloatEvaluation(ctx context.Context, flag string, defaultValue float64, evalCtx openfeature.FlattenedContext) openfeature.FloatResolutionDetail {
 	value, resolutionDetails := p.resolveValue(ctx, flag, FlagType_Float)
-	return openfeature.FloatResolutionDetail{Value: value.(float64), ProviderResolutionDetail: resolutionDetails}
+	floatResolutionDetails := openfeature.FloatResolutionDetail{ProviderResolutionDetail: resolutionDetails}
+	if value != nil {
+		floatResolutionDetails.Value = value.(float64)
+	}
+	return floatResolutionDetails
 
 }
 
 // IntEvaluation returns an int flag
 func (p *PulumiESCProvider) IntEvaluation(ctx context.Context, flag string, defaultValue int64, evalCtx openfeature.FlattenedContext) openfeature.IntResolutionDetail {
 	value, resolutionDetails := p.resolveValue(ctx, flag, FlagType_Integer)
-	return openfeature.IntResolutionDetail{Value: value.(int64), ProviderResolutionDetail: resolutionDetails}
+	intResolutionDetails := openfeature.IntResolutionDetail{ProviderResolutionDetail: resolutionDetails}
+	if value != nil {
+		intResolutionDetails.Value = value.(int64)
+	}
+	return intResolutionDetails
 
 }
 
