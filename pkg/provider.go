@@ -11,14 +11,14 @@ import (
 	esc "github.com/pulumi/esc-sdk/sdk/go"
 )
 
-type FlagType int
+type FlagType string
 
 const (
-	FlagType_Bool FlagType = iota
-	FlagType_String
-	FlagType_Integer
-	FlagType_Float
-	FlagType_Object
+	FlagType_Bool    FlagType = "bool"
+	FlagType_String  FlagType = "string"
+	FlagType_Integer FlagType = "int"
+	FlagType_Float   FlagType = "float"
+	FlagType_Object  FlagType = "object"
 )
 
 const (
