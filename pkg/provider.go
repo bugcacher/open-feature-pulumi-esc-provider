@@ -44,7 +44,7 @@ func NewPulumiESCProvider(orgName, projectName, envName, accessKey string, opts 
 	escAuthCtx := esc.NewAuthContext(accessKey)
 	env, err := escClient.OpenEnvironment(escAuthCtx, orgName, projectName, envName)
 	if err != nil {
-		return nil, fmt.Errorf("failed to initiaze pulumi esc provider: %w", err)
+		return nil, fmt.Errorf("failed to initialise pulumi esc provider: %w", err)
 	}
 	provider := &PulumiESCProvider{
 		state:               openfeature.ReadyState,
