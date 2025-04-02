@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/open-feature/go-sdk/openfeature"
@@ -16,8 +17,8 @@ type FlagType string
 const (
 	FlagType_Bool    FlagType = "bool"
 	FlagType_String  FlagType = "string"
-	FlagType_Integer FlagType = "int"
-	FlagType_Float   FlagType = "float"
+	FlagType_Integer FlagType = "int64"
+	FlagType_Float   FlagType = "float64"
 	FlagType_Object  FlagType = "object"
 )
 
@@ -144,7 +145,7 @@ func (p *PulumiESCProvider) resolveValue(ctx context.Context, propertyPath strin
 		return nil, openfeature.ProviderResolutionDetail{ResolutionError: openfeature.NewGeneralResolutionError(err.Error())}
 	}
 	if !validateType(rawValue, flagType) {
-		return nil, openfeature.ProviderResolutionDetail{ResolutionError: openfeature.NewTypeMismatchResolutionError(fmt.Sprintf("%s not of type %s", propertyPath, flagType))}
+		return nil, openfeature.ProviderResolutionDetail{ResolutionError: openfeature.NewTypeMismatchResolutionError(fmt.Sprintf("%s is of type %s, not of type %s", propertyPath, reflect.TypeOf(rawValue), flagType))}
 	}
 	return rawValue, openfeature.ProviderResolutionDetail{
 		Reason: openfeature.StaticReason,
