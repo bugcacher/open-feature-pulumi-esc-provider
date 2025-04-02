@@ -115,7 +115,7 @@ func (p *PulumiESCProvider) IntEvaluation(ctx context.Context, flag string, defa
 	value, resolutionDetails := p.resolveValue(ctx, flag, FlagType_Integer)
 	intResolutionDetails := openfeature.IntResolutionDetail{ProviderResolutionDetail: resolutionDetails}
 	if value != nil {
-		intResolutionDetails.Value = value.(int64)
+		intResolutionDetails.Value = int64(value.(float64))
 	}
 	return intResolutionDetails
 
@@ -166,7 +166,8 @@ func validateType(rawValue interface{}, flagType FlagType) bool {
 		_, ok := rawValue.(string)
 		return ok
 	case FlagType_Integer:
-		_, ok := rawValue.(int64)
+		// Integer values from Pulumi ESC are returned as float64 by the Pulumi go sdk
+		_, ok := rawValue.(float64)
 		return ok
 	case FlagType_Float:
 		_, ok := rawValue.(float64)
