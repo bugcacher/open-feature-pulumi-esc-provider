@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"reflect"
 	"strings"
 
@@ -35,31 +36,50 @@ type PulumiESCProvider struct {
 	escClient           *esc.EscClient
 	escAuthCtx          context.Context
 	escOpenEnvSessionId string
+	customBackendUrl    *url.URL
 }
 
 type ProviderOption func(p *PulumiESCProvider)
 
 func NewPulumiESCProvider(orgName, projectName, envName, accessKey string, opts ...ProviderOption) (*PulumiESCProvider, error) {
+	provider := &PulumiESCProvider{
+		state:       openfeature.NotReadyState,
+		orgName:     orgName,
+		projectName: projectName,
+		envName:     envName,
+	}
+	for _, opt := range opts {
+		opt(provider)
+	}
+
 	conf := esc.NewConfiguration()
+	if provider.customBackendUrl != nil {
+		customConf, err := esc.NewCustomBackendConfiguration(*provider.customBackendUrl)
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialise pulumi esc provider with custom backend url: %w", err)
+		}
+		conf = customConf
+	}
+
 	escClient := esc.NewClient(conf)
 	escAuthCtx := esc.NewAuthContext(accessKey)
 	env, err := escClient.OpenEnvironment(escAuthCtx, orgName, projectName, envName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialise pulumi esc provider: %w", err)
 	}
-	provider := &PulumiESCProvider{
-		state:               openfeature.ReadyState,
-		orgName:             orgName,
-		projectName:         projectName,
-		envName:             envName,
-		escClient:           escClient,
-		escAuthCtx:          escAuthCtx,
-		escOpenEnvSessionId: env.Id,
-	}
-	for _, opt := range opts {
-		opt(provider)
-	}
+
+	provider.escClient = escClient
+	provider.escAuthCtx = escAuthCtx
+	provider.escOpenEnvSessionId = env.Id
+	provider.state = openfeature.ReadyState
 	return provider, nil
+}
+
+// WithCustomBackendUrl sets the specified URL as the Pulumi ESC backend API endpoint
+func WithCustomBackendUrl(url url.URL) ProviderOption {
+	return func(p *PulumiESCProvider) {
+		p.customBackendUrl = &url
+	}
 }
 
 // Metadata returns the metadata of the provider
