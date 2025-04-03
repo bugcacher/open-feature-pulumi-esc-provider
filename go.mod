@@ -5,6 +5,7 @@ go 1.21
 require (
 	github.com/open-feature/go-sdk v1.14.1
 	github.com/pulumi/esc-sdk/sdk v0.12.1
+	github.com/stretchr/testify v1.10.0
 )
 
 require (
@@ -25,6 +26,7 @@ require (
 	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/containerd/console v1.0.4-0.20230313162750-1ae8d489ac81 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.5 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/djherbis/times v1.5.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
@@ -55,6 +57,7 @@ require (
 	github.com/pgavlin/fx v0.1.6 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/pulumi/appdash v0.0.0-20231130102222-75f619a67231 // indirect
 	github.com/pulumi/esc v0.13.1-0.20250314190530-79238870da74 // indirect
 	github.com/pulumi/pulumi/sdk/v3 v3.137.0 // indirect
@@ -87,3 +90,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/frand v1.4.2 // indirect
 )
+
+replace github.com/open-feature-pulumi-esc-provider => ./pkg
