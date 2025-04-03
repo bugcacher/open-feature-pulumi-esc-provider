@@ -85,6 +85,8 @@ func (p *PulumiESCProvider) BooleanEvaluation(ctx context.Context, flag string, 
 	boolResolutionDetails := openfeature.BoolResolutionDetail{ProviderResolutionDetail: resolutionDetails}
 	if value != nil {
 		boolResolutionDetails.Value = value.(bool)
+	} else {
+		boolResolutionDetails.Value = defaultValue
 	}
 	return boolResolutionDetails
 }
@@ -95,6 +97,8 @@ func (p *PulumiESCProvider) StringEvaluation(ctx context.Context, flag string, d
 	stringResolutionDetails := openfeature.StringResolutionDetail{ProviderResolutionDetail: resolutionDetails}
 	if value != nil {
 		stringResolutionDetails.Value = value.(string)
+	} else {
+		stringResolutionDetails.Value = defaultValue
 	}
 	return stringResolutionDetails
 }
@@ -105,6 +109,8 @@ func (p *PulumiESCProvider) FloatEvaluation(ctx context.Context, flag string, de
 	floatResolutionDetails := openfeature.FloatResolutionDetail{ProviderResolutionDetail: resolutionDetails}
 	if value != nil {
 		floatResolutionDetails.Value = value.(float64)
+	} else {
+		floatResolutionDetails.Value = defaultValue
 	}
 	return floatResolutionDetails
 
@@ -116,6 +122,8 @@ func (p *PulumiESCProvider) IntEvaluation(ctx context.Context, flag string, defa
 	intResolutionDetails := openfeature.IntResolutionDetail{ProviderResolutionDetail: resolutionDetails}
 	if value != nil {
 		intResolutionDetails.Value = int64(value.(float64))
+	} else {
+		intResolutionDetails.Value = defaultValue
 	}
 	return intResolutionDetails
 
@@ -125,6 +133,7 @@ func (p *PulumiESCProvider) IntEvaluation(ctx context.Context, flag string, defa
 func (p *PulumiESCProvider) ObjectEvaluation(ctx context.Context, flag string, defaultValue interface{}, evalCtx openfeature.FlattenedContext) openfeature.InterfaceResolutionDetail {
 	return openfeature.InterfaceResolutionDetail{
 		ProviderResolutionDetail: openfeature.ProviderResolutionDetail{
+			Reason:          openfeature.ErrorReason,
 			ResolutionError: openfeature.NewGeneralResolutionError("ObjectEvaluation not implemented"),
 		},
 	}
@@ -139,13 +148,19 @@ func (p *PulumiESCProvider) resolveValue(ctx context.Context, propertyPath strin
 		var genErr *esc.GenericOpenAPIError
 		if errors.As(err, &genErr) && isKeyNotFoundErr(genErr) {
 			return nil, openfeature.ProviderResolutionDetail{
+				Reason:          openfeature.ErrorReason,
 				ResolutionError: openfeature.NewFlagNotFoundResolutionError(fmt.Sprintf("%s not found", propertyPath)),
 			}
 		}
-		return nil, openfeature.ProviderResolutionDetail{ResolutionError: openfeature.NewGeneralResolutionError(err.Error())}
+		return nil, openfeature.ProviderResolutionDetail{
+			Reason:          openfeature.ErrorReason,
+			ResolutionError: openfeature.NewGeneralResolutionError(err.Error()),
+		}
 	}
 	if !validateType(rawValue, flagType) {
-		return nil, openfeature.ProviderResolutionDetail{ResolutionError: openfeature.NewTypeMismatchResolutionError(fmt.Sprintf("%s is of type %s, not of type %s", propertyPath, reflect.TypeOf(rawValue), flagType))}
+		return nil, openfeature.ProviderResolutionDetail{
+			Reason:          openfeature.ErrorReason,
+			ResolutionError: openfeature.NewTypeMismatchResolutionError(fmt.Sprintf("%s is of type %s, not of type %s", propertyPath, reflect.TypeOf(rawValue), flagType))}
 	}
 	return rawValue, openfeature.ProviderResolutionDetail{
 		Reason: openfeature.StaticReason,
