@@ -9,6 +9,9 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      PULUMI_ORG: ${{ secrets.PULUMI_ORG }}
+      PULUMI_ACCESS_KEY: ${{ secrets.PULUMI_ACCESS_KEY }}
     steps:
     - uses: actions/checkout@v3
 
