@@ -1,0 +1,41 @@
+name: Go Build and Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      PULUMI_ORG: ${{ secrets.PULUMI_ORG }}
+      PULUMI_ACCESS_KEY: ${{ secrets.PULUMI_ACCESS_KEY }}
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+        cache: true
+
+    - name: Install dependencies
+      run: go mod download
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Test
+      run: go test -v ./...
+
+    - name: Run test coverage
+      run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.out
+        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
