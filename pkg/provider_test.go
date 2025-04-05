@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"reflect"
 	"testing"
@@ -471,12 +472,17 @@ func setupTestProvider() error {
 		return fmt.Errorf("failed to create/update pulumi test environment: %w", err)
 	}
 
+	customUrl, err := url.Parse("https://api.pulumi.com")
+	if err != nil {
+		return err
+	}
 	// Set test provider
 	escProvider, err := NewPulumiESCProvider(
 		orgName,
 		PROJECT_NAME,
 		ENV_NAME,
 		accessKey,
+		WithCustomBackendUrl(*customUrl),
 	)
 	if err != nil {
 		return err
