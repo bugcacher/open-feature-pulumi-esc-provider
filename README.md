@@ -177,8 +177,9 @@ func main() {
 		"configs.OPENAI_API_KEY",
 		"sk-12345", openfeature.EvaluationContext{},
 	)
-	fmt.Println("Encrypted Secret (Pulumi ESC secret value):", secretValue.secretValue)
-	fmt.Println("Is secret value? ", secretValue.FlagMetadata.GetBool("secret"))
+	fmt.Println("Encrypted Secret (Pulumi ESC secret value):", secretValue.Value)
+	isSecret, _ := secretValue.FlagMetadata.GetBool("secret")
+	fmt.Println("Is secret value %t", isSecret)
 }
 
 ```
