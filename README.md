@@ -183,6 +183,10 @@ func main() {
 
 ```
 
+## Options
+
+- **WithCustomBackendUrl**: It sets the specified URL as the Pulumi ESC backend API endpoint.
+
 ## Why Use This?
 
 Environment variables and secrets are traditionally handled via .env files, CI/CD variables, or K8s secrets—each with its own limitations and risks.
