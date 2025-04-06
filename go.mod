@@ -1,4 +1,4 @@
-module github.com/open-feature-pulumi-esc-provider
+module github.com/bugcacher/open-feature-pulumi-esc-provider
 
 go 1.21
 
