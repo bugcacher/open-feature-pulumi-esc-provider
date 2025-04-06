@@ -3,11 +3,11 @@
 <p>
   <img alt="OpenFeature + Pulumi ESC" src="https://img.shields.io/badge/openfeature-provider-blue" />
   <img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/bugcacher/open-feature-pulumi-esc-provider" />
-  <img alt="PkgGoDev" src="https://pkg.go.dev/badge/github.com/bugcacher/open-feature-pulumi-esc-provider" />
+  <a href="https://pkg.go.dev/github.com/bugcacher/open-feature-pulumi-esc-provider"><img src="https://pkg.go.dev/badge/github.com/bugcacher/open-feature-pulumi-esc-provider.svg" alt="Go Reference"></a>
   <img alt="Coverage" src="https://img.shields.io/codecov/c/github/bugcacher/open-feature-pulumi-esc-provider" />
   <img alt="GitHub Release" src="https://img.shields.io/github/v/release/bugcacher/open-feature-pulumi-esc-provider" />
   <img alt="License" src="https://img.shields.io/github/license/bugcacher/open-feature-pulumi-esc-provider" />
-  <img alt="GitHub Stars" src="https://img.shields.io/github/stars/your-org/your-repo?style=social" />
+  <img alt="GitHub Stars" src="https://img.shields.io/github/stars/bugcacher/open-feature-pulumi-esc-provider?style=social" />
 </p>
 
 An [OpenFeature](https://openfeature.dev/docs/reference/intro#what-is-openfeature) provider written in Go for securely accessing **secrets and configuration values** from [Pulumi ESC](https://www.pulumi.com/esc/). This [provider](https://openfeature.dev/docs/reference/concepts/provider) allows your application to retrieve values like API keys, DB URLs, feature flags, and more — in a typed, structured, and cloud-agnostic way.
